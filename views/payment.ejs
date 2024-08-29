@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Checkout</title>
+    <script src="https://js.stripe.com/v3/"></script>
+  </head>
+  <body>
+    <button id="checkout-button">Checkout</button>
+
+    <script>
+      var stripe = Stripe(
+        "pk_test_51Ml3wJGui44lwdb4K6apO4rnFrF2ckySwM1TfDcj0lVdSekGOVGrB1uHNlmaO7wZPxwHfRZani73KlHQKOiX4JmK00E0l7opJO"
+      ); // Replace with your publishable key
+
+      var checkoutButton = document.getElementById("checkout-button");
+      checkoutButton.addEventListener("click", function () {
+        const data = { coach_id: 1, amount: 100, session_name: "some name" };
+        fetch("/create-checkout-session", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json", // Specify the content type as JSON
+          },
+          body: JSON.stringify(data), // Convert the JavaScript object to a JSON string
+        })
+          .then(function (response) {
+            return response.json(); // Parse the JSON response body
+          })
+          .then(function (session) {
+            if (session.url) {
+              // Ensure the session.url exists before redirecting
+              window.location = session.url; // Redirect to the session URL
+            } else if (session.error) {
+              // Check if the session contains an error
+              alert(session.error.message); // Show the error message
+            }
+          })
+          .catch(function (error) {
+            console.error("Error:", error); // Log any error that occurs during the fetch operation
+          });
+      });
+    </script>
+  </body>
+</html>
