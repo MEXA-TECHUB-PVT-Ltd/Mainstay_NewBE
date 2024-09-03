@@ -17,9 +17,15 @@ const {
   generateRefreshToken,
 } = require("../utility/token");
 const { getAll } = require("../utility/dbHelper");
-const { renderEJSTemplate, ejsData, coachVerifiedTemplatePath } = require("../utility/renderEmail");
+const {
+  renderEJSTemplate,
+  ejsData,
+  coachVerifiedTemplatePath,
+  coachVerifiedGermanTemplatePath,
+} = require("../utility/renderEmail");
 const sendEmail = require("../utility/sendMail");
 const pool = require("../config/db");
+const { isWithinGermany } = require("../utility/isWithinGermany");
 exports.register = async (req, res) => {
   try {
     const { email, password, user_type } = req.body;
@@ -449,7 +455,7 @@ exports.updateStatus = async (req, res) => {
     }
 
     const coachData = await pool.query(
-      `SELECT first_name, last_name, email FROM users WHERE id = $1`,
+      `SELECT first_name, last_name, email , lat, long FROM users WHERE id = $1`,
       [id]
     );
 
@@ -460,14 +466,26 @@ exports.updateStatus = async (req, res) => {
       coach_name,
       web_link: process.env.FRONTEND_URL,
     };
+
+    console.log(coachData.rows[0]);
+
+    const inGermany = isWithinGermany(
+      coachData?.rows[0]?.lat,
+      coachData?.rows[0]?.long
+    );
+
+    const templatePath = inGermany
+      ? coachVerifiedGermanTemplatePath
+      : coachVerifiedTemplatePath;
+
     const verificationData = ejsData(data);
     const verificationHtmlContent = await renderEJSTemplate(
-      coachVerifiedTemplatePath,
+      templatePath,
       verificationData
     );
     await sendEmail(
       email,
-      "Account Verified",
+      inGermany ? "Konto bestätigt" : "Account Verified",
       verificationHtmlContent
     );
 

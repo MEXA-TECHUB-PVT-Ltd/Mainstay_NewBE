@@ -23,17 +23,21 @@ const {
   verificationEmailTemplatePath,
   ejsData,
   forgetPasswordTemplatePath,
+  forgetPasswordGermanTemplatePath,
+  verificationEmailGermanTemplatePath,
 } = require("../utility/renderEmail");
+const { isWithinGermany } = require("../utility/isWithinGermany");
 
 exports.register = async (req, res) => {
   try {
-    const { email, password, role, firstName, lastName, device_id } = req.body;
+    const { email, password, role, firstName, lastName, device_id, lat, long } =
+      req.body;
 
     // Validate required fields
-    if (!email || !password || !role) {
+    if (!email || !password || !role || !lat || !long) {
       return res.status(400).json({
         success: false,
-        message: "Email, password, device_id and role are required!",
+        message: "Email, password, device_id, role and location are required!",
       });
     }
 
@@ -59,6 +63,11 @@ exports.register = async (req, res) => {
 
     const user = await insertRecord("users", userData);
     const userId = user.id;
+
+    const userLocation = await pool.query(
+      `UPDATE users SET lat = $1 , long = $2  WHERE id = $3 RETURNING *`,
+      [lat, long, userId]
+    );
 
     let typeTable =
       role === "coach" ? "coach_v2" : role === "admin" ? "admin" : "coachee_v2";
@@ -89,14 +98,22 @@ exports.register = async (req, res) => {
         currentYear,
         web_link: process.env.FRONTEND_URL,
       };
+
+      const inGermany = isWithinGermany(
+        userLocation?.rows[0]?.lat,
+        userLocation?.rows[0]?.long
+      );
+
       const verificationData = ejsData(data);
       const verificationHtmlContent = await renderEJSTemplate(
-        verificationEmailTemplatePath,
+        inGermany
+          ? verificationEmailGermanTemplatePath
+          : verificationEmailTemplatePath,
         verificationData
       );
       const emailSent = await sendEmail(
         email,
-        "Registration Verification",
+        inGermany ? "Registrierungsüberprüfung" : "Registration Verification",
         verificationHtmlContent
       );
     }
@@ -125,11 +142,12 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "email and password  required" });
+    const { email, password, role, lat, long } = req.body;
+    if (!email || !password || !lat || !long) {
+      return res.status(400).json({
+        success: false,
+        message: "email, password and location are  required",
+      });
     }
     const filter = [{ field: "email", operator: "=", value: email }];
     if (role) {
@@ -164,6 +182,12 @@ exports.login = async (req, res) => {
       }
     }
     const joinQuery = typeJoinQuery(user.role);
+
+    await pool.query(
+      `UPDATE users SET lat = $1 , long = $2  WHERE email = $3`,
+      [lat, long, email]
+    );
+
     if (role === "admin") {
       const result = await pool.query(
         "SELECT * FROM users WHERE role = 'admin'"
@@ -261,14 +285,21 @@ exports.forgetPassword = async (req, res) => {
           otp: code,
           web_link: process.env.FRONTEND_URL,
         };
+
+        const inGermany = isWithinGermany(user?.lat, user?.long);
+
         const verificationData = ejsData(data);
         const verificationHtmlContent = await renderEJSTemplate(
-          forgetPasswordTemplatePath,
+          inGermany
+            ? forgetPasswordGermanTemplatePath
+            : forgetPasswordTemplatePath,
           verificationData
         );
         const emailSent = await sendEmail(
           email,
-          "Forget Password Verification",
+          inGermany
+            ? "Passwortbestätigung vergessen"
+            : "Forget Password Verification",
           verificationHtmlContent
         );
         return res.status(200).json({

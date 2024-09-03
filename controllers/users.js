@@ -44,6 +44,12 @@ exports.updateProfile = async (req, res) => {
       userUpdateFields.first_name = updateFields.first_name;
     if (updateFields.last_name)
       userUpdateFields.last_name = updateFields.last_name;
+    if (updateFields.lat) {
+      userUpdateFields.lat = updateFields.lat;
+    }
+    if (updateFields.long) {
+      userUpdateFields.long = updateFields.long;
+    }
 
     if (Object.keys(userUpdateFields).length > 0) {
       await updateRecord("users", userUpdateFields, [
@@ -55,6 +61,8 @@ exports.updateProfile = async (req, res) => {
     delete updateFields.role; // Role is not updated
     delete updateFields.first_name;
     delete updateFields.last_name;
+    delete updateFields.lat;
+    delete updateFields.long;
     if (file) {
       updateFields.profile_pic = file.path; // Update profile_pic if a file is uploaded
     }
@@ -153,7 +161,7 @@ exports.getAllByRole = async (req, res) => {
         orderByClause = "ORDER BY u.created_at DESC"; // Default sorting
     }
 
-const query = `
+    const query = `
   SELECT u.id, u.first_name, u.last_name, u.email, u.role, u.status, u.block, u.is_block, u.deleted, u.deleted_at, u.created_at, u.updated_at, 
   ${
     typeTable === "coach_v2"
@@ -211,7 +219,6 @@ const query = `
       .json({ success: false, message: "Internal Server Error" });
   }
 };
-
 
 exports.getByCoachArea = async (req, res) => {
   try {

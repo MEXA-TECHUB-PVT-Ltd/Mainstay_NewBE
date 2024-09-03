@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #fff;
+      }
+      .primary {
+        color: #0f6d6a !important;
+      }
+      .container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #ffff;
+      }
+      .header {
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .content {
+        margin: 20px 0;
+        text-align: center;
+        background-color: #ffff;
+        padding: 10px;
+      }
+      .verification {
+        padding: 10px 20px;
+        width: auto; /* Adjusts width automatically based on content */
+        border: 2px solid #0f6d6a; /* Solid or more pronounced border */
+        border-radius: 10px;
+        border-style: dashed;
+        display: inline-block;
+        font-family: "Courier New", monospace; /* Monospaced font for better readability */
+        font-size: 20px; /* Larger font size */
+        font-weight: bold; /* Bold font */
+        text-align: center; /* Center align text */
+      }
+
+      .footer {
+        padding: 10px;
+        text-align: center;
+        font-size: 12px;
+      }
+      .button {
+        display: inline-block;
+        padding: 10px 15px;
+        margin: 10px auto;
+        background-color: #0f6d6a;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+      }
+      .mx-2 {
+        margin: 0 20px;
+      }
+      .color-black {
+        color: #000;
+      }
+      .footer-icons {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <!-- Your logo goes here -->
+        <img
+          src="https://res.cloudinary.com/dfbds6fd7/image/upload/v1715683419/mainstays/email/Mainstays_mit_Claim_CMYK_1_gypyzn.png"
+          alt="Logo"
+          style="width: 80px"
+        />
+        <p id="currentDate"></p>
+      </div>
+
+      <div class="content">
+        <h1 class="color-black primary">Lieber <%= data.coachee_name %></h1>
+        <p class="color-black">
+          Ihre Zahlung für eine Sitzung bei <%= data.coachee_name %> wurde erfolgreich durchgeführt.
+        </p>
+        <p class="color-black">Name: <%= data.coachee_name %></p>
+        <p class="color-black">E-Mail: <%= data.coachee_email %></p>
+        <p class="color-black">Datum: <%= data.date %></p>
+        <p class="color-black">Zeit: <%= data.time %></p>
+        <p class="color-black">Betrag: <%= data.amount %></p>
+        <p class="color-black">Mit freundlichen Grüßen,</p>
+      </div>
+      <!-- Checkout Website Link -->
+      <a href="<%= data.web_link %>" class="button">Besuchen Sie unsere Website</a>
+      
+  </body>
+</html>
