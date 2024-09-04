@@ -2,11 +2,14 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const pool = require("../config/db");
 const coacheeModule = require("../models/coachee");
 const paymentModel = require("../models/payment");
+const { isWithinGermany } = require("../utility/isWithinGermany");
 const {
   sessionPayTemplatePath,
   ejsData,
   renderEJSTemplate,
   sessionPayCoacheeTemplatePath,
+  sessionPayGermanTemplatePath,
+  sessionPayCoacheeGermanTemplatePath,
 } = require("../utility/renderEmail");
 const sendEmail = require("../utility/sendMail");
 exports.createStripeCustomer = async (req, res) => {
@@ -419,7 +422,7 @@ exports.transferFunds = async (req, res) => {
         message: "Coach's Stripe account ID is missing",
       });
     }
-    
+
     const coacheeCardResult = await pool.query(
       "SELECT card_id FROM cards WHERE user_id = $1",
       [coachee_id]
@@ -435,7 +438,7 @@ exports.transferFunds = async (req, res) => {
 
     const applicationFeeAmount = (amount / 100) * 19;
     const amountInRappen = amount * 100;
-    
+
     const paymentIntent = await stripe.paymentIntents.create({
       payment_method: paymentMethodId,
       customer: customer_id,
@@ -455,25 +458,24 @@ exports.transferFunds = async (req, res) => {
         coachee_id,
       },
     });
-    
+
     await pool.query(
       "INSERT INTO notification_requests_payment (title, type, coachee_id) VALUES ($1, $2, $3) RETURNING *",
       ["PAYMENT SUCCESSFUL", "PAYMENT", coachee_id]
     );
-    
+
     const coachData = await pool.query(
-      `SELECT first_name, last_name, email FROM users WHERE id = $1`,
+      `SELECT first_name, last_name, email , lat , long FROM users WHERE id = $1`,
       [coach_id]
     );
     const coacheeData = await pool.query(
-      `SELECT first_name, last_name, email FROM users WHERE id = $1`,
+      `SELECT first_name, last_name, email , lat, long FROM users WHERE id = $1`,
       [coachee_id]
     );
     const sessionData = await pool.query(
       `SELECT * FROM sessions WHERE id = $1`,
       [session_id]
     );
-
 
     const coach_name =
       coachData.rows[0].first_name + " " + coachData.rows[0].last_name;
@@ -494,19 +496,37 @@ exports.transferFunds = async (req, res) => {
       date: date,
       web_link: process.env.FRONTEND_URL,
     };
+
+    const coachInGermany = isWithinGermany(
+      coachData?.rows[0]?.lat,
+      coachData?.rows[0]?.long
+    );
+    const coacheeInGermany = isWithinGermany(
+      coacheeData?.rows[0]?.lat,
+      coacheeData?.rows[0]?.long
+    );
+
     const verificationData = ejsData(data);
     const verificationHtmlContent = await renderEJSTemplate(
-      sessionPayTemplatePath,
+      coachInGermany ? sessionPayGermanTemplatePath : sessionPayTemplatePath,
       verificationData
     );
     const verificationHtmlContentCoachee = await renderEJSTemplate(
-      sessionPayCoacheeTemplatePath,
+      coacheeInGermany
+        ? sessionPayCoacheeGermanTemplatePath
+        : sessionPayCoacheeTemplatePath,
       verificationData
     );
-    await sendEmail(email, "Received Session Payment", verificationHtmlContent);
+    await sendEmail(
+      email,
+      coachInGermany ? "Sitzungszahlung erhalten" : "Received Session Payment",
+      verificationHtmlContent
+    );
     await sendEmail(
       coachee_email,
-      "Session Payment Successful",
+      coacheeInGermany
+        ? "Sitzungszahlung erfolgreich"
+        : "Session Payment Successful",
       verificationHtmlContentCoachee
     );
     return res.status(200).json({

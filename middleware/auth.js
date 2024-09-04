@@ -5,15 +5,21 @@ dotenv.config();
 module.exports = {
   isAuthenticated: (req, res, next) => {
     // Get the token from the request
-    const token = req.headers.authorization;
-    if (!token) {
+    const authtoken = req.headers.authorization;
+    if (!authtoken) {
       return res
         .status(401)
         .json({ message: "Unauthorized: No token provided" });
     }
+
+    const token = authtoken.startsWith("Bearer ")
+      ? authtoken.split(" ")[1]
+      : authtoken;
+
     // Verify the token using a secret
     jwt.verify(token, process.env.SECRET_KEY, async (err, decoded) => {
       if (err) {
+        console.log(err);
         return res.status(401).json({ message: "Unauthorized: Invalid token" });
       }
       req.user = decoded;

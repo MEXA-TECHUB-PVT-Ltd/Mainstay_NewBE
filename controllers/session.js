@@ -1,11 +1,14 @@
 const pool = require("../config/db");
 const session = require("../models/session");
 const { getAll } = require("../utility/dbHelper");
+const { isWithinGermany } = require("../utility/isWithinGermany");
 const {
   ejsData,
   renderEJSTemplate,
   sessionAcceptedTemplatePath,
   sessionRequestTemplatePath,
+  sessionAcceptedGermanTemplatePath,
+  sessionRequestGermanTemplatePath,
 } = require("../utility/renderEmail");
 const sendEmail = require("../utility/sendMail");
 
@@ -29,11 +32,11 @@ exports.createSession = async (req, res) => {
     }
 
     const coachData = await pool.query(
-      `SELECT first_name, last_name, email FROM users WHERE id = $1`,
+      `SELECT first_name, last_name, email , lat , long FROM users WHERE id = $1`,
       [coach_id]
     );
     const coacheeData = await pool.query(
-      `SELECT first_name, last_name, email FROM users WHERE id = $1`,
+      `SELECT first_name, last_name, email , lat, long FROM users WHERE id = $1`,
       [coachee_id]
     );
 
@@ -89,14 +92,20 @@ exports.createSession = async (req, res) => {
       date,
       web_link: process.env.FRONTEND_URL,
     };
+
+    const inGermany = isWithinGermany(
+      coachData.rows[0].lat,
+      coachData.rows[0].long
+    );
+
     const verificationData = ejsData(data);
     const verificationHtmlContent = await renderEJSTemplate(
-      sessionRequestTemplatePath,
+      inGermany ? sessionRequestGermanTemplatePath : sessionRequestTemplatePath,
       verificationData
     );
     const emailSent = await sendEmail(
       email,
-      "New Session Request",
+      inGermany ? "Neue Sitzungsanfrage" : "New Session Request",
       verificationHtmlContent
     );
 
@@ -613,11 +622,11 @@ exports.updateSessionStatus = async (req, res) => {
       accepted_at: new Date(),
     };
     const coachData = await pool.query(
-      `SELECT first_name, last_name, email FROM users WHERE id = $1`,
+      `SELECT first_name, last_name, email , lat, long FROM users WHERE id = $1`,
       [coach_id]
     );
     const coacheeData = await pool.query(
-      `SELECT first_name, last_name, email FROM users WHERE id = $1`,
+      `SELECT first_name, last_name, email , lat, long FROM users WHERE id = $1`,
       [coachee_id]
     );
 
@@ -642,14 +651,22 @@ exports.updateSessionStatus = async (req, res) => {
       date: dateNow,
       web_link: process.env.FRONTEND_URL,
     };
+
+    const inGermany = isWithinGermany(
+      coacheeData.rows[0].lat,
+      coacheeData.rows[0].long
+    );
+
     const verificationData = ejsData(data);
     const verificationHtmlContent = await renderEJSTemplate(
-      sessionAcceptedTemplatePath,
+      inGermany
+        ? sessionAcceptedGermanTemplatePath
+        : sessionAcceptedTemplatePath,
       verificationData
     );
     const emailSent = await sendEmail(
       coachee_email,
-      "Session Accepted",
+      inGermany ? "Sitzung angenommen" : "Session Accepted",
       verificationHtmlContent
     );
   }
