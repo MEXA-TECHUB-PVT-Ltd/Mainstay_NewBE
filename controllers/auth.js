@@ -143,10 +143,10 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password, role, lat, long } = req.body;
-    if (!email || !password || !lat || !long) {
+    if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "email, password and location are  required",
+        message: "email and password are  required",
       });
     }
     const filter = [{ field: "email", operator: "=", value: email }];
@@ -203,6 +203,13 @@ exports.login = async (req, res) => {
     }
 
     if (role !== "admin") {
+      if (!lat || !long) {
+        return res.status(400).json({
+          success: false,
+          message: "location is  required",
+        });
+      }
+
       const { rows } = await pool.query(joinQuery, [user.id]);
 
       if (rows.length === 0) {

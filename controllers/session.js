@@ -397,6 +397,7 @@ SELECT
     json_build_object(
         'id', s.id,
         'coaching_area_name', ca.name,
+        'coaching_area_german_name' , ca.german_name,
         'coach_name', coach.first_name || ' ' || coach.last_name,
         'coachee_name', coachee.first_name || ' ' || coachee.last_name,
         'coach_id', c.user_id,

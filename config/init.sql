@@ -294,14 +294,6 @@ CREATE TABLE IF NOT EXISTS well_coins(
     session_id INT REFERENCES sessions(id) ON DELETE CASCADE,
     coins INT,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE IF NOT EXISTS coachee_badges(
-    id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    name VARCHAR(100),
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT unique_user_id UNIQUE (user_id)
 );
 -- **************************
