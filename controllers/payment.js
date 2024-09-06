@@ -3,6 +3,7 @@ const pool = require("../config/db");
 const coacheeModule = require("../models/coachee");
 const paymentModel = require("../models/payment");
 const { isWithinGermany } = require("../utility/isWithinGermany");
+const { afterCompletePayment } = require("../utility/payments.");
 const {
   sessionPayTemplatePath,
   ejsData,
@@ -468,6 +469,7 @@ exports.transferFunds = async (req, res) => {
       `SELECT first_name, last_name, email , lat , long FROM users WHERE id = $1`,
       [coach_id]
     );
+
     const coacheeData = await pool.query(
       `SELECT first_name, last_name, email , lat, long FROM users WHERE id = $1`,
       [coachee_id]
@@ -529,13 +531,16 @@ exports.transferFunds = async (req, res) => {
         : "Session Payment Successful",
       verificationHtmlContentCoachee
     );
+
+    console.log("Payment Successfull.......>>");
+
     return res.status(200).json({
       success: true,
       message: "Payment has been successful",
       // result: paymentIntent,
     });
   } catch (error) {
-    console.error(error);
+    console.log("Error Occured during payment : ", error);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",

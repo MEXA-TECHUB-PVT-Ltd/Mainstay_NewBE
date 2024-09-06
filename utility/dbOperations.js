@@ -16,8 +16,7 @@ const insertRecord = async (tableName, data) => {
 
   try {
     const insertResult = await pool.query(insertQuery, values);
-    console.log("",
-      insertResult);
+    console.log("", insertResult);
     return insertResult.rows[0];
   } catch (error) {
     if (error.code === "23505") {
