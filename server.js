@@ -135,7 +135,7 @@ app.get("/email", async (req, res) => {
   });
 });
 
-const port = process.env.PORT || 3000;
+const port =  3001;
 app.use(cors());
 app.use("/api/coachee", coachee);
 app.use("/api/coach", coach);
