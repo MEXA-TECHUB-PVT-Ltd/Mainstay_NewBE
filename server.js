@@ -34,7 +34,7 @@ const { Server } = require("socket.io");
 const moment = require("moment");
 
 const stripe = require("stripe")(
-  "sk_test_51Ml3wJGui44lwdb4hcY6Nr91bXfxAT2KVFXMxiV6ridW3LCMcB6aoV9ZAQxL3kDjaBphiAoga8ms0zbUiQjbZgzd00DpMxrLNL"
+  "sk_test_51Ml3wJGui44lwdb4hcY6Nr91bXfxAT2KVFXMxiV6ridW3LCMcB6aoV9ZAQxL3kDjaBphiAoga8ms0zbUiQjbZgzd00DpMxrLN"
 );
 // const stripe = require("stripe")(
 //   "sk_test_51OmriNHtA3SK3biQL8S0aKmV7f0lXuskZx1007UoWekU80nAwpXCtqZM63GOr3oaHr6ewNBlY1F9hL8oQ0K8SoxL00z86ycA77"
@@ -65,8 +65,13 @@ const io = new Server(server, { cors: { origin: "*" } });
 app.use(express.static(path.join(__dirname, "public")));
 
 // This is your Stripe CLI webhook secret for testing your endpoint locally.
+
 // const endpointSecret = "whsec_bVONTUjpWxDkC0XNskkr7wgPychc8IJu";
 const endpointSecret = "whsec_XjAzOvTh1C1QPugQLwrWmDH9vrktuyh8";
+
+// const endpointSecret = "whsec_ltNrS9kFNXZdnkWca6u8qLl3K78BHFQm";
+
+
 app.post(
   "/webhook",
   express.raw({ type: "application/json" }),
@@ -135,7 +140,7 @@ app.get("/email", async (req, res) => {
   });
 });
 
-const port = process.env.PORT || 3000;
+const port =  3001;
 app.use(cors());
 app.use("/api/coachee", coachee);
 app.use("/api/coach", coach);

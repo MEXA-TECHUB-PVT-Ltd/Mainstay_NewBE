@@ -6,10 +6,10 @@ const fs = require('fs');
 const path = require('path');
 
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_ADDRESS,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
+  user: 'mainstays_user',
+  host: "postgres-staging-projects.mtechub.com",
+  database: "mainstays_db",
+  password: "mtechub123",
   port: 5432,
 });
 
