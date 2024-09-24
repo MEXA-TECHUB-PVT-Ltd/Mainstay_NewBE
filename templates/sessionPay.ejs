@@ -87,16 +87,18 @@
 
       <div class="content">
         <h1 class="color-black primary">Dear <%= data.coach_name %></h1>
-        <p class="color-black">You got a payment for a session by <%= data.coachee_name %> </p>
+        <p class="color-black">
+          You got a payment for a session by <%= data.coachee_name %>
+        </p>
         <p class="color-black">Name: <%= data.coachee_name %></p>
         <p class="color-black">Email: <%= data.coachee_email %></p>
         <p class="color-black">Date: <%= data.date %></p>
         <p class="color-black">Time: <%= data.time %></p>
         <p class="color-black">Amount: <%= data.amount %></p>
         <p class="color-black">Best regards,</p>
+        <a href="<%= data.web_link %>" class="button">Check Out Our Website</a>
       </div>
-              <!-- Checkout Website Link -->
-        <a href=<%= data.web_link  %> class="button">Check Out Our Website</a>
+      <!-- Checkout Website Link -->
     </div>
   </body>
 </html>
