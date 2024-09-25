@@ -13,6 +13,7 @@ const {
   sessionPayCoacheeGermanTemplatePath,
 } = require("../utility/renderEmail");
 const sendEmail = require("../utility/sendMail");
+const moment = require("moment");
 exports.createStripeCustomer = async (req, res) => {
   try {
     const id = req.user.userId;
@@ -481,15 +482,19 @@ exports.transferFunds = async (req, res) => {
 
     const coach_name =
       coachData.rows[0].first_name + " " + coachData.rows[0].last_name;
+    const coach_email = coachData.rows[0].email;
     const coachee_name =
       coacheeData.rows[0].first_name + " " + coacheeData.rows[0].last_name;
     const email = coachData.rows[0].email;
     const coachee_email = coacheeData.rows[0].email;
     const duration = sessionData.rows[0].duration;
-    const section = sessionData.rows[0].section;
-    const date = sessionData.rows[0].date;
+    const section = moment(sessionData.rows[0].section, "HH:mm:ss").format(
+      "HH:mm"
+    );
+    const date = moment(sessionData.rows[0].date).format("YYYY-MM-DD");
     const data = {
       coach_name,
+      coach_email,
       coachee_name,
       coachee_email,
       duration,

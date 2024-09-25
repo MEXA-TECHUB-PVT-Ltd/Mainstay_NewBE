@@ -11,6 +11,7 @@ const {
   sessionRequestGermanTemplatePath,
 } = require("../utility/renderEmail");
 const sendEmail = require("../utility/sendMail");
+const moment = require("moment");
 
 exports.createSession = async (req, res) => {
   try {
@@ -600,9 +601,11 @@ exports.updateSessionStatus = async (req, res) => {
   ]);
   const coachee_id = sessionData.rows[0].coachee_id;
   const duration = sessionData.rows[0].duration;
-  const sectionTime = sessionData.rows[0].section;
+  const sectionTime = moment(sessionData.rows[0].section, "HH:mm:ss").format(
+    "HH:mm"
+  );
   const amount = sessionData.rows[0].amount;
-  const dateNow = sessionData.rows[0].date;
+  const dateNow = moment(sessionData.rows[0].date).format("YYYY-MM-DD");
   if (updateFields.status === "accepted" && date && section) {
     const checkSession = await pool.query(
       `SELECT * FROM sessions WHERE coach_id = $1 AND date = $2 AND section = $3 AND status = $4`,
@@ -667,7 +670,7 @@ exports.updateSessionStatus = async (req, res) => {
     );
     const emailSent = await sendEmail(
       coachee_email,
-      inGermany ? "Sitzung angenommen" : "Session Accepted",
+      inGermany ? "Buchungsbestätigung" : "Session Accepted",
       verificationHtmlContent
     );
   }
