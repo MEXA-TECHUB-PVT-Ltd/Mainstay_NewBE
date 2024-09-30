@@ -71,7 +71,12 @@ const endpointSecret = "whsec_XjAzOvTh1C1QPugQLwrWmDH9vrktuyh8";
 
 // const endpointSecret = "whsec_ltNrS9kFNXZdnkWca6u8qLl3K78BHFQm";
 
-
+app.use(
+  cors({
+    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
+    origin: "*",
+  })
+);
 app.post(
   "/webhook",
   express.raw({ type: "application/json" }),
