@@ -66,9 +66,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // This is your Stripe CLI webhook secret for testing your endpoint locally.
 
-
 const endpointSecret = "whsec_wacAkOnREImvUMMBalPINJYOELdirvxx";
-
 
 app.use(
   cors({
@@ -76,7 +74,6 @@ app.use(
     origin: "*",
   })
 );
-
 
 app.post(
   "/webhook",
@@ -146,7 +143,7 @@ app.get("/email", async (req, res) => {
   });
 });
 
-const port = 5019;
+const port = 3001;
 
 app.use(
   cors({
