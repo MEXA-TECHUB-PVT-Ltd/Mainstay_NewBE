@@ -34,7 +34,7 @@ const { Server } = require("socket.io");
 const moment = require("moment");
 
 const stripe = require("stripe")(
-  "sk_test_51Ml3wJGui44lwdb4hcY6Nr91bXfxAT2KVFXMxiV6ridW3LCMcB6aoV9ZAQxL3kDjaBphiAoga8ms0zbUiQjbZgzd00DpMxrLN"
+  "sk_test_51Ml3wJGui44lwdb4hcY6Nr91bXfxAT2KVFXMxiV6ridW3LCMcB6aoV9ZAQxL3kDjaBphiAoga8ms0zbUiQjbZgzd00DpMxrLNL"
 );
 // const stripe = require("stripe")(
 //   "sk_test_51OmriNHtA3SK3biQL8S0aKmV7f0lXuskZx1007UoWekU80nAwpXCtqZM63GOr3oaHr6ewNBlY1F9hL8oQ0K8SoxL00z86ycA77"
@@ -66,9 +66,17 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // This is your Stripe CLI webhook secret for testing your endpoint locally.
 
-// const endpointSecret = "whsec_bVONTUjpWxDkC0XNskkr7wgPychc8IJu";
 
 const endpointSecret = "whsec_wacAkOnREImvUMMBalPINJYOELdirvxx";
+
+
+app.use(
+  cors({
+    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
+    origin: "*",
+  })
+);
+
 
 app.post(
   "/webhook",
