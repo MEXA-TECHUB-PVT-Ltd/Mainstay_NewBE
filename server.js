@@ -67,10 +67,8 @@ app.use(express.static(path.join(__dirname, "public")));
 // This is your Stripe CLI webhook secret for testing your endpoint locally.
 
 // const endpointSecret = "whsec_bVONTUjpWxDkC0XNskkr7wgPychc8IJu";
-const endpointSecret = "whsec_XjAzOvTh1C1QPugQLwrWmDH9vrktuyh8";
 
-// const endpointSecret = "whsec_ltNrS9kFNXZdnkWca6u8qLl3K78BHFQm";
-
+const endpointSecret = "whsec_wacAkOnREImvUMMBalPINJYOELdirvxx";
 
 app.post(
   "/webhook",
@@ -140,8 +138,14 @@ app.get("/email", async (req, res) => {
   });
 });
 
-const port =  3001;
-app.use(cors());
+const port = 5019;
+
+app.use(
+  cors({
+    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
+    origin: "*",
+  })
+);
 app.use("/api/coachee", coachee);
 app.use("/api/coach", coach);
 app.use("/api/section", section);

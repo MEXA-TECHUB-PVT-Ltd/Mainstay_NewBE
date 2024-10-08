@@ -410,7 +410,10 @@ SELECT
         `
         : `
             co.date_of_birth, co.phone, co.gender, co.profile_pic, co.customer_id, co.language, 
-            co.country_id, ARRAY(SELECT name FROM coach_area WHERE id = ANY(co.interests)) AS interests,
+            co.country_id,
+             ARRAY( SELECT json_build_object('name', name, 'german_name', german_name) 
+    FROM coach_area 
+    WHERE id = ANY(co.interests)) AS interests,
             (SELECT name FROM country WHERE id = co.country_id) AS country_name, SUM(wl.coins) AS total_coins, cb.name
         `
     }
